@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+jinja2
+requests
+newspaper3k
+spacy
+sentence-transformers
+scikit-learn
+pillow
+torch
+transformers
+python-multipart
+aiofiles

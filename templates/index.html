@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Misinformation Detector — Prototype</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <h1>Misinformation Detector</h1>
+      <p class="tag">Prototype • Demo-mode • Local testing</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <form method="post" action="/analyze" enctype="multipart/form-data" id="analyzeForm">
+        <label>Paste a news URL</label>
+        <input type="url" name="url" placeholder="https://example.com/article" />
+        <label>Or paste text</label>
+        <textarea name="text" placeholder="Paste article text or a paragraph...">{{ input_text or '' }}</textarea>
+        <label>Or upload an image</label>
+        <input type="file" name="file" accept="image/*" />
+        <div style="text-align:right; margin-top:12px;">
+          <button type="submit" class="btn">Analyze</button>
+        </div>
+      </form>
+    </section>
+
+    {% if image_b64 %}
+    <section class="panel">
+      <h2>Image preview & checks</h2>
+      <div class="row">
+        <div class="col-40">
+          <img class="preview" src="data:image;base64,{{ image_b64 }}" alt="uploaded image"/>
+        </div>
+        <div class="col-60">
+          {% if image_info %}
+            <p><b>Verdict:</b> {{ image_info.verdict }}</p>
+            <p><b>Suspicion score:</b> {{ image_info.suspicion_score }}</p>
+            <p><b>Reasons:</b> {% if image_info.reasons %}{{ image_info.reasons|join(', ') }}{% else %}None{% endif %}</p>
+            <p><b>Dimensions:</b> {{ image_info.width }} × {{ image_info.height }}</p>
+            <p><b>File size:</b> {{ (image_info.size_bytes // 1024) }} KB</p>
+          {% else %}
+            <p>Image check unavailable</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if result %}
+    <section class="panel">
+      <h2>Claim analysis</h2>
+      <div class="cards">
+        {% for r in result %}
+          <article class="card">
+            <div class="card-head">
+              <strong>Claim</strong>
+              <span class="score {% if r.score >= 70 %}green{% elif r.score >= 45 %}yellow{% else %}red{% endif %}">{{ r.score }}</span>
+            </div>
+            <p class="claim-text">{{ r.claim }}</p>
+
+            <div class="meta">
+              <div><b>Fact-check:</b> {{ r.fact.rating }}</div>
+              <div>
+                {% if r.fact.source %}
+                  <b>Source:</b> <a href="{{ r.fact.source }}" target="_blank" rel="noopener">{{ r.fact.source }}</a>
+                {% else %}
+                  <b>Source:</b> None
+                {% endif %}
+              </div>
+              {% if r.fact.match_score %}
+              <div><b>Match confidence:</b> {{ "%.2f"|format(r.fact.match_score) }}</div>
+              {% endif %}
+              <div class="method"><i>method: {{ r.fact.method }}</i></div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  </main>
+
+  <footer class="container footer">
+    <small>Prototype — for demo & testing. Not a production service. To plug real APIs, set environment variables and update services/factcheck.py.</small>
+  </footer>
+</body>
+</html>

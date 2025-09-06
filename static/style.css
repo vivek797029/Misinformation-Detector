@@ -1,0 +1,47 @@
+:root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --accent:#0d6efd;
+    --muted:#6b7280;
+    --green:#16a34a;
+    --red:#ef4444;
+    --yellow:#f59e0b;
+    --maxw:960px;
+  }
+  
+  *{box-sizing:border-box}
+  body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); margin:0; color:#111}
+  .container{max-width:var(--maxw); margin:28px auto; padding:0 18px}
+  .topbar{background:linear-gradient(90deg, rgba(13,110,253,0.12), rgba(13,110,253,0.06)); padding:20px 0}
+  .topbar h1{margin:0; color:var(--accent); font-weight:700}
+  .topbar .tag{color:var(--muted); margin-top:6px}
+  
+  .panel{background:var(--card); padding:18px; border-radius:12px; box-shadow:0 6px 18px rgba(17,24,39,0.06); margin-bottom:18px}
+  form input[type="url"], form textarea, form input[type="file"]{
+    width:100%; padding:12px 10px; border-radius:8px; border:1px solid #e6e9ef; margin-top:8px; outline:none;
+  }
+  textarea{min-height:120px; resize:vertical}
+  label{font-weight:600; color:#111}
+  .btn{background:var(--accent); color:white; border:none; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600}
+  
+  .row{display:flex; gap:18px; flex-wrap:wrap}
+  .col-40{flex:0 0 40%}
+  .col-60{flex:1}
+  .preview{max-width:100%; border-radius:10px; border:1px solid #eef2ff}
+  
+  .cards{display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:12px; margin-top:12px}
+  .card{background:#fff; padding:12px; border-radius:10px; border:1px solid #eef2ff}
+  .card-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
+  .claim-text{font-size:15px; margin:8px 0 12px; color:#111}
+  .score{padding:6px 8px; border-radius:8px; font-weight:700; color:white}
+  .score.green{background:var(--green)}
+  .score.yellow{background:var(--yellow)}
+  .score.red{background:var(--red)}
+  .meta{font-size:13px; color:var(--muted); display:flex; flex-direction:column; gap:6px}
+  .method{margin-top:6px; font-style:italic; color:#8b8f98}
+  
+  .footer{margin-top:24px; color:var(--muted); text-align:center}
+  @media (max-width:680px){
+    .col-40, .col-60{flex:100%}
+  }
+  
