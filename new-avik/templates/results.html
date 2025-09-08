@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Veritas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .score-circle-bg { stroke: #e5e7eb; }
+        .score-circle-fg {
+            transition: stroke-dashoffset 0.8s ease-out;
+            transform: rotate(-90deg); transform-origin: 50% 50%;
+        }
+        .score-red { stroke: #ef4444; } .score-text-red { color: #ef4444; }
+        .score-yellow { stroke: #f59e0b; } .score-text-yellow { color: #f59e0b; }
+        .score-green { stroke: #16a34a; } .score-text-green { color: #16a34a; }
+        .claim-score-dot {
+            width: 24px; height: 24px; border-radius: 50%; display: flex;
+            justify-content: center; align-items: center; color: white;
+            font-weight: 700; font-size: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-12 max-w-5xl">
+        <header class="flex justify-between items-center mb-10">
+            <a href="/" class="text-2xl font-bold text-blue-600">Veritas</a>
+            <a href="/" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700">Analyze Another</a>
+        </header>
+
+        <main>
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">Credibility Analysis</h2>
+                <p class="text-gray-500 mb-6 truncate">Source: <span class="font-medium text-gray-600">{{ input_source }}</span></p>
+
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="w-48 h-48 relative">
+                        <svg class="w-full h-full" viewBox="0 0 120 120">
+                            <circle class="score-circle-bg" cx="60" cy="60" r="54" stroke-width="12" fill="none"></circle>
+                            <circle id="score-circle" class="score-circle-fg" cx="60" cy="60" r="54" stroke-width="12" fill="none"
+                                    stroke-dasharray="339.29" stroke-dashoffset="339.29"></circle>
+                        </svg>
+                        <div id="score-text-container" class="absolute inset-0 flex justify-center items-center">
+                            <span id="score-text" class="text-5xl font-bold"></span>
+                        </div>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h3 id="verdict-text" class="text-3xl font-bold mb-2">{{ verdict }}</h3>
+                        <p class="text-gray-600 max-w-md">This score is an estimate based on automated checks. Always verify information from multiple trusted sources.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {% if image_info %}
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 h-full">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Image Analysis</h3>
+                        <img class="rounded-lg border border-gray-200 mb-4" src="data:image/png;base64,{{ image_b64 }}" alt="Uploaded Image">
+                        <div class="space-y-3 text-sm">
+                            <p><b>Verdict:</b> <span class="font-medium">{{ image_info.verdict }}</span></p>
+                            <p><b>Suspicion Score:</b> <span class="font-medium">{{ image_info.suspicion_score }} / 100</span></p>
+                            <p><b>Reasons:</b> <span class="font-medium">{{ image_info.reasons|join(', ') if image_info.reasons else 'None' }}</span></p>
+                            <p><b>Metadata (EXIF):</b> <span class="font-medium">{{ 'Present' if image_info.has_exif else 'Not Found' }}</span></p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if results %}
+                <div class="{% if image_info %}lg:col-span-2{% else %}lg:col-span-3{% endif %}">
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Claim-by-Claim Breakdown</h3>
+                        <div class="space-y-4">
+                            {% for r in results %}
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex justify-between items-start gap-4 mb-2">
+                                    <p class="text-gray-800">{{ r.claim }}</p>
+                                    <div class="claim-score-dot flex-shrink-0" style="background-color: {{ '#16a34a' if r.score >= 70 else ('#f59e0b' if r.score >= 45 else '#ef4444') }};">{{ r.score }}</div>
+                                </div>
+                                <div class="text-xs text-gray-500 border-t border-gray-100 pt-2">
+                                    <p><b>Fact-check:</b> <span class="font-medium">{{ r.fact.rating }}</span></p>
+                                    {% if r.fact.source %}
+                                    <p><b>Source:</b> <a href="{{ r.fact.source }}" target="_blank" rel="noopener" class="text-blue-600 hover:underline break-all">{{ r.fact.source }}</a></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if not results and not image_info %}
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center"><h3 class="text-lg font-semibold">No Analysis Available</h3><p class="text-gray-600">No claims were extracted, and no image was provided for analysis.</p></div>
+            {% endif %}
+        </main>
+        <footer class="text-center mt-12"><p class="text-sm text-gray-500">Prototype — for demo & testing purposes.</p></footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const score = {{ overall_score }};
+            const circle = document.getElementById('score-circle');
+            const scoreText = document.getElementById('score-text');
+            const verdictText = document.getElementById('verdict-text');
+            const circumference = 339.29; // 2 * PI * 54
+            
+            scoreText.textContent = score;
+
+            let colorClass = 'score-red';
+            let textColorClass = 'score-text-red';
+            if (score >= 75) { colorClass = 'score-green'; textColorClass = 'score-text-green'; }
+            else if (score >= 50) { colorClass = 'score-yellow'; textColorClass = 'score-text-yellow'; }
+            
+            circle.classList.add(colorClass);
+            scoreText.classList.add(textColorClass);
+            verdictText.classList.add(textColorClass);
+
+            const offset = circumference - (score / 100) * circumference;
+            setTimeout(() => { circle.style.strokeDashoffset = offset; }, 100);
+        });
+    </script>
+</body>
+</html>
+
