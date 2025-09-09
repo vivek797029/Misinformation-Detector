@@ -1,13 +1,18 @@
+# Web Framework & Server
 fastapi
-uvicorn[standard]
+uvicorn
+python-multipart
 jinja2
-requests
+
+# Content Extraction & NLP
 newspaper3k
 spacy
 sentence-transformers
-scikit-learn
-pillow
+
+# Machine Learning & Image Processing
+# Note: torch is a dependency for sentence-transformers
 torch
-transformers
-python-multipart
-aiofiles
+Pillow
+
+# Testing Framework
+pytest
